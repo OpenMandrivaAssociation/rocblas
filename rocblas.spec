@@ -21,7 +21,7 @@ BuildRequires:	rocm-cmake
 BuildRequires:	hipcc
 BuildRequires:	rocm-hip-devel
 BuildRequires:	clang >= %{rocm_llvm_maj_ver}
-BuildRequires:	lib64llvm-devel >= %{rocm_llvm_maj_ver}
+BuildRequires:	llvm-devel >= %{rocm_llvm_maj_ver}
 BuildRequires:	python3
 BuildRequires:	python-tensile
 BuildRequires:	python%{pyver}dist(pyyaml)
