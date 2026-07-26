@@ -19,6 +19,8 @@ BuildRequires:	cmake
 BuildRequires:	ninja
 BuildRequires:	rocm-cmake
 BuildRequires:	hipcc
+BuildRequires:	rocminfo
+BuildRequires:	clang-tools
 BuildRequires:	rocm-hip-devel
 BuildRequires:	clang >= %{rocm_llvm_maj_ver}
 BuildRequires:	llvm-devel >= %{rocm_llvm_maj_ver}
