@@ -3,6 +3,7 @@
 Name:		rocblas
 Version:	7.14.0
 Release:	1
+%{!?rocm_llvm_maj_ver:%global rocm_llvm_maj_ver 23}
 Summary:	HIP Basic Linear Algebra Subprograms library
 License:	BSD-3-Clause AND MIT
 Group:		System/Libraries
@@ -20,7 +21,7 @@ BuildRequires:	rocm-cmake
 BuildRequires:	hipcc
 BuildRequires:	rocm-hip-devel
 BuildRequires:	clang >= %{rocm_llvm_maj_ver}
-BuildRequires:	libllvm-devel >= %{rocm_llvm_maj_ver}
+BuildRequires:	lib64llvm-devel >= %{rocm_llvm_maj_ver}
 BuildRequires:	python3
 BuildRequires:	python-tensile
 BuildRequires:	python%{pyver}dist(pyyaml)
