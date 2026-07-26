@@ -1,0 +1,85 @@
+# Soft-fail when Tensile library is missing for a GPU arch so rocBLAS source
+# GEMM (gemm_templates.cpp) can run instead of aborting. Needed for gfx803
+# until r9nano Tensile libs are built, and as a general safety net.
+--- a/library/src/tensile_host.cpp	2026-07-25 00:31:37.747442444 +0200
++++ b/library/src/tensile_host.cpp	2026-07-25 00:32:11.108649191 +0200
+@@ -861,28 +861,16 @@
+ #endif
+                     if(!TestPath(tensileLibraryPath))
+                     {
+-#if ROCBLAS_TENSILE_SEPARATE_ARCH
+-                        rocblas_cerr << "\nrocBLAS error: Cannot read " << tensileLibraryPath
+-                                     << ": " << strerror(errno) << " for GPU arch : " << processor
+-                                     << std::endl;
+-#if ROCBLAS_TENSILE_LAZY_LOAD
+-                        std::regex fileMatcher(path + "/TensileLibrary_lazy.*");
+-#else
+-                        std::regex fileMatcher(path + "/TensileLibrary_gfx\\d+.dat");
+-#endif
+-                        rocblas_cerr << " List of available TensileLibrary Files : " << std::endl;
+-                        for(auto& file_name : fs::directory_iterator(path))
+-                        {
+-                            if(std::regex_match(file_name.path().string(), fileMatcher))
+-                            {
+-                                rocblas_cerr << file_name << std::endl;
+-                            }
+-                        }
+-#else
+-                        rocblas_cerr << "\nrocBLAS error: Cannot read " << tensileLibraryPath
+-                                     << ": " << strerror(errno) << std::endl;
+-#endif
+-                        rocblas_abort();
++                        // OpenMandriva: soft-fail so source-GEMM fallback can run on
++                        // arches without a Tensile library (or before it is rebuilt).
++                        static auto& once
++                            = rocblas_cerr
++                              << "\nrocBLAS warning: No Tensile library for GPU arch "
++                              << processor << " under " << path
++                              << "; falling back to rocBLAS source GEMM." << std::endl;
++                        std::lock_guard<std::mutex> lock(m_libraryMapMutex);
++                        m_libraryMap[processor] = nullptr;
++                        return m_libraryMap[processor];
+                     }
+                 }
+             }
+@@ -1054,10 +1042,13 @@
+ 
+                 if(m_libraryMap.find(processor) == m_libraryMap.end())
+                 {
+-                    rocblas_cerr << "\nrocBLAS error: Could not initialize Tensile library for "
+-                                    "architecture: "
+-                                 << processor << std::endl;
+-                    rocblas_abort();
++                    static auto& once
++                        = rocblas_cerr
++                          << "\nrocBLAS warning: Could not initialize Tensile library for "
++                             "architecture: "
++                          << processor
++                          << "; falling back to rocBLAS source GEMM." << std::endl;
++                    m_libraryMap[processor] = nullptr;
+                 }
+             }
+ 
+@@ -1292,6 +1283,14 @@
+             auto& adapter
+                 = get_library_and_adapter(&library, &deviceProp, prob.handle->getDevice());
+ 
++            // No Tensile library for this arch: allow source GEMM fallback
++            if(!library || !deviceProp)
++            {
++                status = rocblas_status_not_implemented;
++            }
++            else
++            {
++
+             hardware = Tensile::hip::GetDevice(*deviceProp);
+ 
+             auto  tensile_prob  = ConstructTensileProblem(prob);
+@@ -1381,6 +1380,7 @@
+                     }
+                 }
+             }
++            } // end else: Tensile library present
+         }
+         catch(const std::exception& e)
+         {

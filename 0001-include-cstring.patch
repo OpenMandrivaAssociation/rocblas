@@ -1,0 +1,10 @@
+--- a/library/src/include/handle.hpp
++++ b/library/src/include/handle.hpp
+@@ -21,6 +21,7 @@
+  * ************************************************************************ */
+ 
+ #pragma once
++#include <cstring>
+ 
+ #include "definitions.hpp"
+ #include "rocblas.h"
