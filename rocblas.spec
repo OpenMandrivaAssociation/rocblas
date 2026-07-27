@@ -34,6 +34,7 @@ BuildRequires:	pkgconfig(msgpack-c)
 BuildRequires:	lib64msgpack-c-devel
 BuildRequires:	lib64msgpack-cpp-devel
 BuildRequires:	boost-devel
+BuildRequires:	git-core
 # GTest not needed with clients off
 
 ExclusiveArch:	%{x86_64} %{aarch64}
