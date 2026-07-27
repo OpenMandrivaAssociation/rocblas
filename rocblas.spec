@@ -35,6 +35,7 @@ BuildRequires:	lib64msgpack-c-devel
 BuildRequires:	lib64msgpack-cpp-devel
 BuildRequires:	boost-devel
 BuildRequires:	git-core
+BuildRequires:	stdc++-static-devel
 # GTest not needed with clients off
 
 ExclusiveArch:	%{x86_64} %{aarch64}
