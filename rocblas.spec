@@ -33,6 +33,7 @@ BuildRequires:	python%{pyver}dist(rich)
 BuildRequires:	pkgconfig(msgpack-c)
 BuildRequires:	lib64msgpack-c-devel
 BuildRequires:	lib64msgpack-cpp-devel
+BuildRequires:	boost-devel
 # GTest not needed with clients off
 
 ExclusiveArch:	%{x86_64} %{aarch64}
