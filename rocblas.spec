@@ -2,7 +2,7 @@
 
 Name:		rocblas
 Version:	7.14.0
-Release:	1
+Release:	2
 %{!?rocm_llvm_maj_ver:%global rocm_llvm_maj_ver 23}
 Summary:	HIP Basic Linear Algebra Subprograms library
 License:	BSD-3-Clause AND MIT
@@ -38,7 +38,6 @@ BuildRequires:	git-core
 BuildRequires:	stdc++-static-devel
 # GTest not needed with clients off
 
-ExclusiveArch:	%{x86_64} %{aarch64}
 
 %description
 rocBLAS provides BLAS Level 1/2/3 for HIP. Dense GEMM kernels are generated at
