@@ -1,14 +1,14 @@
-# HIP BLAS library (TheRock 7.14). Tensile GEMMs including gfx803 (r9nano).
+# HIP BLAS library (TheRock 10.0). Tensile GEMMs including gfx803 (r9nano).
 
 Name:		rocblas
-Version:	7.14.0
-Release:	2
+Version:	10.0.0
+Release:	1
 %{!?rocm_llvm_maj_ver:%global rocm_llvm_maj_ver 23}
 Summary:	HIP Basic Linear Algebra Subprograms library
 License:	BSD-3-Clause AND MIT
 Group:		System/Libraries
 URL:		https://github.com/ROCm/rocm-libraries
-Source0:	https://github.com/ROCm/rocm-libraries/releases/download/therock-7.14/rocblas.tar.gz#/rocblas-%{version}.tar.gz
+Source0:	https://github.com/ROCm/rocm-libraries/releases/download/therock-10.0/rocblas.tar.gz#/rocblas-%{version}.tar.gz
 # Clang 23 freestanding headers: strncmp needs <cstring>
 Patch0:		0001-include-cstring.patch
 # Soft-fail missing Tensile library → source GEMM fallback
@@ -66,7 +66,7 @@ export CXXFLAGS
 export CFLAGS="$CXXFLAGS"
 export LDFLAGS=$(printf '%s' "%{?__global_ldflags}" | sed -E 's/-mfpmath=[^ ]+//g; s/ -m[a-z0-9+.=]+//g')
 # Point Tensile at the system package root
-TENSILE_ROOT=$(python3 -c 'import Tensile, os; print(os.path.dirname(Tensile.__file__))')
+TENSILE_ROOT=$(python -c 'import Tensile, os; print(os.path.dirname(Tensile.__file__))')
 export TENSILE_ROOT
 # Tensile multi-arch: Tensile_CPU_THREADS=8 (32 OOMs on ~64G). Prefer TMPDIR on large disk.
 %cmake %{rocm_cmake_fhs} %{rocm_cmake_gpu_targets_blas} \
