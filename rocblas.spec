@@ -2,7 +2,7 @@
 
 Name:		rocblas
 Version:	10.0.0
-Release:	1
+Release:	2
 %{!?rocm_llvm_maj_ver:%global rocm_llvm_maj_ver 23}
 Summary:	HIP Basic Linear Algebra Subprograms library
 License:	BSD-3-Clause AND MIT
@@ -13,6 +13,14 @@ Source0:	https://github.com/ROCm/rocm-libraries/releases/download/therock-10.0/r
 Patch0:		0001-include-cstring.patch
 # Soft-fail missing Tensile library → source GEMM fallback
 Patch1:		0002-soft-fail-missing-tensile-lib.patch
+# Do not leave hipErrorInvalidImage in the HIP TLS after Kernels.so load
+Patch2:		0003-clear-hip-error-after-helper-load.patch
+# Helper Kernels.so-*.hsaco are AMDGPU ELF ET_DYN. The ".so" in the
+# filename matches rpm's strip glob; full find-debuginfo strip drops
+# .symtab and hipModuleLoad then returns "device kernel image is invalid".
+# ggml HIP / sd-cli treat that leftover hipGetLastError as a failed MUL_MAT.
+# -g = strip debug only (eu-strip --strip-debug still loads). Same as hipblaslt.
+%global _find_debuginfo_opts -g
 
 BuildRequires:	rocm-rpm-macros
 BuildRequires:	cmake
@@ -108,6 +116,7 @@ if [ -d %{buildroot}/usr/lib/cmake/rocblas ] && [ ! -d %{buildroot}%{_libdir}/cm
 	rmdir %{buildroot}/usr/lib/cmake 2>/dev/null || true
 	rmdir %{buildroot}/usr/lib 2>/dev/null || true
 fi
+find %{buildroot} -name '*.hsaco' -exec chmod 644 {} +
 
 %files
 %license LICENSE.md

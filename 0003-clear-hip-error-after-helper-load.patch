@@ -1,0 +1,33 @@
+# hipModuleLoad of stripped Kernels.so-*.hsaco fails with
+# hipErrorInvalidImage / hipErrorFileNotFound and leaves that in the
+# thread-local HIP error. ggml HIP / sd-cli then treat hipGetLastError()
+# after a successful hipblasSgemm as a failed MUL_MAT.
+# Consume the leftover error after helper init and after a successful
+# Tensile launch. Pair with %global _find_debuginfo_opts -g so the
+# helpers actually load.
+--- a/library/src/tensile_host.cpp
++++ b/library/src/tensile_host.cpp
+@@ -1014,8 +1014,11 @@
+ 
+             {
+                 // initialize adapter for lazy loading or experimental code objects
+                 PRINT_IF_HIP_ERROR(adapter.initializeLazyLoading(processor, path));
++                // Stripped Kernels.so-* hipModuleLoad failures must not leak
++                // into the caller (ggml checks hipGetLastError after hipblas).
++                (void)hipGetLastError();
+ 
+                 // Load library for this specific architecture if not already loaded
+ 
+                 std::lock_guard<std::mutex> libLock(m_libraryMapMutex);
+@@ -1399,8 +1402,11 @@
+                             if(hip_status != hipSuccess)
+                                 status = rocblas_internal_convert_hip_to_rocblas_status(hip_status);
+                             else
+                                 status = rocblas_status_success;
++                            // Drop leftover helper-kernel load errors if the
++                            // contraction itself reported success.
++                            (void)hipGetLastError();
+                         }
+                         else
+                         {
+                             status = rocblas_status_success;
