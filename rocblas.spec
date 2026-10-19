@@ -1,14 +1,14 @@
-# HIP BLAS library (TheRock 10.0). Tensile GEMMs including gfx803 (r9nano).
+# HIP BLAS library (TheRock 10.1). Tensile GEMMs including gfx803 (r9nano).
 
 Name:		rocblas
-Version:	10.0.0
-Release:	2
+Version:	10.1.0
+Release:	1
 %{!?rocm_llvm_maj_ver:%global rocm_llvm_maj_ver 23}
 Summary:	HIP Basic Linear Algebra Subprograms library
 License:	BSD-3-Clause AND MIT
 Group:		System/Libraries
 URL:		https://github.com/ROCm/rocm-libraries
-Source0:	https://github.com/ROCm/rocm-libraries/releases/download/therock-10.0/rocblas.tar.gz#/rocblas-%{version}.tar.gz
+Source0:	https://github.com/ROCm/rocm-libraries/releases/download/therock-10.1/rocblas.tar.gz#/rocblas-%{version}.tar.gz
 # Clang 23 freestanding headers: strncmp needs <cstring>
 Patch0:		0001-include-cstring.patch
 # Soft-fail missing Tensile library → source GEMM fallback
